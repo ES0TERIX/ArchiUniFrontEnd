@@ -73,7 +73,7 @@ export class ParcoursDAO implements IDAO<Parcours> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve([...this.parcours]); // Retourne une copie du tableau
-      }, 300);
+      });
     });
   }
 }
