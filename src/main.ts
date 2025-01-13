@@ -7,6 +7,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import vSelect from 'vue-select';
+import 'bootstrap-icons/font/bootstrap-icons.min.css';
 
 const app = createApp(App).component('v-select', vSelect);
 
