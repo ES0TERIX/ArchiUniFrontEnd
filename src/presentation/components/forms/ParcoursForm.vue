@@ -30,24 +30,33 @@ const closeForm = () => {
   currentParcours.value = new Parcours(null, null, null);
 };
 
-const saveParcours = () => {
+const emit = defineEmits(['parcoursAdded', 'parcoursUpdated']);
 
+const saveParcours = () => {
   if (formErrors.value.NomParcours || formErrors.value.AnneeFormation) {
     alert('Veuillez corriger les erreurs avant de sauvegarder');
     return;
   }
   if (currentParcours.value.ID) {
-    // Mise à jour d'un parcours
+    ParcoursDAO.getInstance().update(currentParcours.value.ID, currentParcours.value)
+      .then(() => {
+        alert('Parcours modifié avec succès');
+        emit('parcoursUpdated', currentParcours.value);
+        closeForm();
+      })
+      .catch((ex) => {
+        alert(ex.message);
+      });
   } else {
-    ParcoursDAO.getInstance().create(currentParcours.value).then(() => {
+    ParcoursDAO.getInstance().create(currentParcours.value).then((newParcours) => {
       alert('Parcours créé avec succès');
+      emit('parcoursAdded', newParcours);
       closeForm();
     }).catch((ex) => {
       alert(ex.message);
     });
   }
 };
-
 const props = defineProps({
   parcours: {
     type: Object as () => Parcours | null,

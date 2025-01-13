@@ -1,44 +1,53 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-
 import { BootstrapButtonEnum } from '@/types/BootstrapButtonEnum';
-
 import CustomButton from '@/presentation/components/forms/components/CustomButton.vue';
-
 import ParcoursForm from '@/presentation/components/forms/ParcoursForm.vue';
-
 import CustomTable from '@/presentation/components/tables/CustomTable.vue';
-
 import { Parcours } from '@/domain/entities/Parcours';
-
 import { ParcoursDAO } from '@/domain/daos/ParcoursDAO';
 
 const parcours = ref<Parcours[]>([]);
 const parcoursForm = ref<typeof ParcoursForm | null>(null);
 
-const formatterEdition = (parcours: Parcours) => {
+const formatterEdition = () => {
   return '<i class="bi bi-pen-fill text-primary"></i>';
 };
 
-const formatterSuppression = (parcours: Parcours) => {
+const formatterSuppression = () => {
   return '<i class="bi bi-trash-fill text-danger"></i>';
 };
 
 const columns = [
-  { field: 'EditionParcours', label: 'Edition', formatter: formatterEdition, onClick: () => { } },
-  { field: 'ID', label: 'ID', formatter: null },
-  { field: 'NomParcours', label: 'Intitulé', formatter: null, onClick: null },
-  { field: 'AnneeFormation', label: 'Année', formatter: null, onClick: null },
-  { field: 'DeleteParcours', label: 'Suppression', formatter: formatterSuppression, onClick: () => { } },
+
+  { field: 'EditionParcours', label: 'Edition', formatter: formatterEdition, onClick: (p: Parcours) => parcoursForm.value?.openForm(p), style: 'width: 32px;text-align:center;' },
+
+  { field: 'ID', label: 'ID', formatter: null, onClick: null, style: null },
+
+  { field: 'NomParcours', label: 'Intitulé', formatter: null, onClick: null, style: null },
+
+  { field: 'AnneeFormation', label: 'Année', formatter: null, onClick: null, style: null },
+
+  { field: 'DeleteParcours', label: 'Suppression', formatter: formatterSuppression, onClick: () => { }, style: 'width: 32px;text-align:center;' },
+
 ];
+
+
+const handleParcoursUpdated = (updatedParcours: Parcours) => {
+  const index = parcours.value.findIndex(p => p.ID === updatedParcours.ID);
+  if (index !== -1) {
+    parcours.value[index] = updatedParcours;
+  }
+};
+
+const handleParcoursAdded = (newParcours: Parcours) => {
+  parcours.value.push(newParcours);
+};
 
 onMounted(() => {
   ParcoursDAO.getInstance().list().then((data) => {
     parcours.value = data;
   });
-
-
-
 });
 </script>
 
@@ -58,6 +67,10 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <ParcoursForm ref="parcoursForm" :parcours="null" />
-
+  <ParcoursForm
+    ref="parcoursForm"
+    :parcours="null"
+    @parcoursAdded="handleParcoursAdded"
+    @parcoursUpdated="handleParcoursUpdated"
+  />
 </template>
