@@ -1,6 +1,5 @@
 import type { Parcours } from '../entities/Parcours';
 import type { IDAO } from './IDAO';
-import axios from 'axios';
 
 export class ParcoursDAO implements IDAO<Parcours> {
   private static instance: ParcoursDAO;
@@ -60,15 +59,13 @@ export class ParcoursDAO implements IDAO<Parcours> {
 
   public async delete(id: number): Promise<void> {
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const index = this.parcours.findIndex(p => p.ID === id);
-        if (index !== -1) {
-          this.parcours.splice(index, 1);
-          resolve();
-        } else {
-          reject(new Error('Parcours non trouvé'));
-        }
-      }, 300);
+      const index = this.parcours.findIndex(p => p.ID === id);
+      if (index !== -1) {
+        this.parcours.splice(index, 1);
+        resolve();
+      } else {
+        reject(new Error('Parcours non trouvé'));
+      }
     });
   }
 
