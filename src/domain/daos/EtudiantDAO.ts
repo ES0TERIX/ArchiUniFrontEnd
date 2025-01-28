@@ -1,39 +1,81 @@
 import { Etudiant } from '../entities/Etudiant';
 import type { IDAO } from './IDAO';
+
 export class EtudiantDAO implements IDAO<Etudiant> {
-  // pas encore d'api pour les Etudiants
-  private static instance : EtudiantDAO;
-  private etudiants : Etudiant[] = [];
+  private static instance: EtudiantDAO;
+  private etudiants: Etudiant[] = [];
+
   private constructor() {}
-  static getInstance() : EtudiantDAO {
+
+  static getInstance(): EtudiantDAO {
     if (!EtudiantDAO.instance) {
       EtudiantDAO.instance = new EtudiantDAO();
     }
     return EtudiantDAO.instance;
   }
+
   async getAll(): Promise<Etudiant[]> {
-    return this.etudiants;
+    return new Promise((resolve) => {
+        resolve([...this.etudiants]);
+    });
   }
+
   async get(id: number): Promise<Etudiant> {
-    return this.etudiants.find((etudiants) => etudiants.ID === id) as Etudiant;
+    return new Promise((resolve, reject) => {
+      const etudiant = this.etudiants.find((e) => e.ID === id);
+      if (etudiant) {
+        resolve({ ...etudiant });
+      } else {
+        reject(new Error('Etudiant non trouvé'));
+      }
+    });
   }
+
   async create(data: Etudiant): Promise<Etudiant> {
-    // const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/ue`, data.toJSON());
-    data.ID = this.etudiants.length > 0 ? (this.etudiants[this.etudiants.length - 1]?.ID ?? 0) + 1 : 1;
-    return data;
+    return new Promise((resolve) => {
+      const newId = this.etudiants.length > 0
+        ? Math.max(...this.etudiants.map(e => e.ID || 0)) + 1
+        : 1;
+
+      const newEtudiant = {
+        ...data,
+        ID: newId
+      };
+
+      this.etudiants.push(newEtudiant);
+      resolve({ ...newEtudiant });
+    });
   }
+
   async update(id: number, data: Etudiant): Promise<Etudiant> {
-    const index = this.etudiants.findIndex((etudiants) => etudiants.ID === id);
-    if (index === -1) {
-      throw new Error('Etudiant non trouvé');
-    }
-    return this.etudiants[index];
+    return new Promise((resolve, reject) => {
+      const index = this.etudiants.findIndex((e) => e.ID === id);
+      if (index === -1) {
+        reject(new Error('Etudiant non trouvé'));
+        return;
+      }
+
+      this.etudiants[index] = { ...data };
+      resolve({ ...this.etudiants[index] });
+    });
   }
+
   async delete(id: number): Promise<void> {
-    // const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/ue/${id}`);
-    this.etudiants = this.etudiants.filter((etudiants) => etudiants.ID !== id);
+    return new Promise((resolve, reject) => {
+      const index = this.etudiants.findIndex((e) => e.ID === id);
+      if (index === -1) {
+        reject(new Error('Etudiant non trouvé'));
+        return;
+      }
+
+      this.etudiants.splice(index, 1);
+      resolve();
+    });
   }
+
   async list(): Promise<Etudiant[]> {
-    return this.etudiants;
+    return new Promise((resolve) => {
+        resolve([...this.etudiants]);
+    });
   }
 }

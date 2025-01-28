@@ -45,7 +45,6 @@ export class ParcoursDAO implements IDAO<Parcours> {
 
   public async update(id: number, data: Parcours): Promise<Parcours> {
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
         const index = this.parcours.findIndex(p => p.ID === id);
         if (index !== -1) {
           this.parcours[index] = { ...data, ID: id };
@@ -53,7 +52,6 @@ export class ParcoursDAO implements IDAO<Parcours> {
         } else {
           reject(new Error('Parcours non trouvé'));
         }
-      }, 300);
     });
   }
 
